@@ -1,4 +1,4 @@
-package com.batch.springdemobatch.config;
+package com.batch.springdemobatch.batch.extensions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
