@@ -3,6 +3,8 @@ package com.batch.springdemobatch.batch.extensions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
@@ -23,6 +25,8 @@ public class TransactionRecordFileldSetMapper implements FieldSetMapper<Transact
 			"country", "territory", "contactLastName", "contactFirstName", "dealSize" };
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("M/DD/YYYY HH:MI:SS AM");
+	
+	private static final Logger logger = LoggerFactory.getLogger(TransactionValidator.class);
 
 	@Override
 	public Transaction mapFieldSet(FieldSet fieldSet) throws BindException {
@@ -36,6 +40,7 @@ public class TransactionRecordFileldSetMapper implements FieldSetMapper<Transact
 		try {
 			transaction.setOrderDate(sdf.parse(fieldSet.readString(5)));
 		} catch (ParseException pe) {
+			logger.error("Error while parsing order date" , pe);
 			pe.printStackTrace();
 		}
 		transaction.setStatus(fieldSet.readString(6));
