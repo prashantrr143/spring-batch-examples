@@ -17,6 +17,10 @@ public class Transaction implements Serializable {
 			+ ":productCode,:customerName,:phone,:addressLine1,:addressLine2,:city,:state,:postalCode,"
 			+ ":country,:territory,:contactLastName,:contactFirstName,:dealSize)";
 
+	public static final String SELECT_TRANSACTION_SQL = "SELECT * FROM SALES_TRANSACTION";
+
+	public static final String SELECT_TRANSACTION_GROUPED_BY_SQL = "select count(*),productcode from sales_transaction group by productcode";
+
 	/**
 	 * 
 	 */

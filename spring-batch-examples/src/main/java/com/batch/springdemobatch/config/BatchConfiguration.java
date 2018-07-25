@@ -25,6 +25,7 @@ import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 
 import com.batch.springdemobatch.batch.extensions.TransactionItemSkipListerner;
@@ -40,6 +41,7 @@ import com.batch.springdemobatch.model.Transaction;
  *
  */
 
+@Profile("single")
 @Configuration
 public class BatchConfiguration {
 	

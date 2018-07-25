@@ -4,11 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.batch.springdemobatch.model.Transaction;
 
 @Component
+@Profile({"single","steps"})
 public class TransactionItemReadListener implements ItemReadListener<Transaction>{
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionItemSkipListerner.class);

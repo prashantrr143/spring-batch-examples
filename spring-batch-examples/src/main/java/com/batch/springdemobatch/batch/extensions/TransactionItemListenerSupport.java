@@ -3,10 +3,12 @@ package com.batch.springdemobatch.batch.extensions;
 
 
 import org.springframework.batch.core.listener.ItemListenerSupport;
+import org.springframework.context.annotation.Profile;
 
 import com.batch.springdemobatch.model.Transaction;
 
 
+@Profile("single")
 public class TransactionItemListenerSupport extends ItemListenerSupport<Transaction, Transaction> {
 
 	@Override

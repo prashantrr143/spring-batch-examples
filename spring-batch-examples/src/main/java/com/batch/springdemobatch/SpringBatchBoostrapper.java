@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableBatchProcessing
+
 public class SpringBatchBoostrapper {
 
 	public static void main(String[] args) {

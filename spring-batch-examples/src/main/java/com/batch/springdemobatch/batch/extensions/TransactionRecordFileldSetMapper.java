@@ -17,6 +17,7 @@ import com.batch.springdemobatch.model.Transaction;
  * @author prashantsingh
  *
  */
+
 public class TransactionRecordFileldSetMapper implements FieldSetMapper<Transaction> {
 
 	public static String[] FIELDS_METADATA = new String[] { "orderNumber", "quantityOrdered", "priceEach",

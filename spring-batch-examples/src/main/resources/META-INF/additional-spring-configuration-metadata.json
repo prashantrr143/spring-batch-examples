@@ -1,47 +1,54 @@
-{"properties": [
-  {
-    "name": "spring.postgresql.datasource.url",
-    "type": "java.lang.String",
-    "description": "Postgresql Datasource url connection string"
-  },
-  {
-    "name": "spring.postgresql.datasource.username",
-    "type": "java.lang.String",
-    "description": "Postgresql datasource user name"
-  },
-  {
-    "name": "spring.postgresql.datasource.password",
-    "type": "java.lang.String",
-    "description": "Posgtresql datasource connection password"
-  },
-  {
-    "name": "spring.postgresql.datasource.driver-class-name",
-    "type": "java.lang.String",
-    "description": "Postgresql datasource jdbc driver class name"
-  },
-  {
-    "name": "spring.oracle.datasource.url",
-    "type": "java.lang.String",
-    "description": "Oracle Datasource url connection string"
-  },
-  {
-    "name": "spring.oracle.datasource.username",
-    "type": "java.lang.String",
-    "description": "Oracle datasource user name"
-  },
-  {
-    "name": "spring.oracle.datasource.password",
-    "type": "java.lang.String",
-    "description": "Oracle datasource connection password"
-  },
-  {
-    "name": "spring.oracle.datasource.driver-class-name",
-    "type": "java.lang.String",
-    "description": "Oracle datasource jdbc driver class name"
-  },
-  {
-    "name": "spring-batch.single.input.resource.path",
-    "type": "java.lang.String",
-    "description": "A description for 'spring-batch.single.input.resource.path'"
-  }
-]}
+{
+	"properties": [
+		{
+			"name": "spring.postgresql.datasource.url",
+			"type": "java.lang.String",
+			"description": "Postgresql Datasource url connection string"
+		},
+		{
+			"name": "spring.postgresql.datasource.username",
+			"type": "java.lang.String",
+			"description": "Postgresql datasource user name"
+		},
+		{
+			"name": "spring.postgresql.datasource.password",
+			"type": "java.lang.String",
+			"description": "Posgtresql datasource connection password"
+		},
+		{
+			"name": "spring.postgresql.datasource.driver-class-name",
+			"type": "java.lang.String",
+			"description": "Postgresql datasource jdbc driver class name"
+		},
+		{
+			"name": "spring.oracle.datasource.url",
+			"type": "java.lang.String",
+			"description": "Oracle Datasource url connection string"
+		},
+		{
+			"name": "spring.oracle.datasource.username",
+			"type": "java.lang.String",
+			"description": "Oracle datasource user name"
+		},
+		{
+			"name": "spring.oracle.datasource.password",
+			"type": "java.lang.String",
+			"description": "Oracle datasource connection password"
+		},
+		{
+			"name": "spring.oracle.datasource.driver-class-name",
+			"type": "java.lang.String",
+			"description": "Oracle datasource jdbc driver class name"
+		},
+		{
+			"name": "spring-batch.single.input.resource.path",
+			"type": "java.lang.String",
+			"description": "A description for 'spring-batch.single.input.resource.path'"
+		},
+		{
+			"name": "spring-batch.single.output.resource.path",
+			"type": "java.lang.String",
+			"description": "A description for 'spring-batch.single.output.resource.path'"
+		}
+	]
+}

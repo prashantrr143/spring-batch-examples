@@ -4,10 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.batch.springdemobatch.model.Transaction;
 
+@Profile("single")
 @Component
 public class TransactionValidator implements Validator<Transaction>{
 

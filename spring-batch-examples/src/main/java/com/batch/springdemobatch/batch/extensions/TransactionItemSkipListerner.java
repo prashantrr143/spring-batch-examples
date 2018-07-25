@@ -4,11 +4,13 @@ package com.batch.springdemobatch.batch.extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.SkipListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.batch.springdemobatch.model.Transaction;
 
 @Component
+@Profile({"single","steps"})
 public class TransactionItemSkipListerner implements SkipListener<Transaction, Transaction> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(TransactionItemSkipListerner.class);
