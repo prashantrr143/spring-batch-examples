@@ -1,4 +1,4 @@
-package com.batch.springdemobatch.config;
+package com.batch.springdemobatch.multisteps.config;
 
 import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +31,7 @@ import com.batch.springdemobatch.batch.extensions.TransactionItemSkipListerner;
 import com.batch.springdemobatch.model.Transaction;
 
 /**
- * Configuration for Spring batch
+ * Configuration for Spring batch supporting multiple steps
  * 
  * We are not configuring a separate JobRepository here. Using the default
  * configured by @EnableBatchProcessing
@@ -41,7 +41,7 @@ import com.batch.springdemobatch.model.Transaction;
  */
 
 @Configuration
-public class BatchConfiguration {
+public class MultiStepsBatchConfiguration {
 	
 
 	/**
@@ -54,6 +54,7 @@ public class BatchConfiguration {
 	private FileSystemResource inputCsv;
 
 	
+
 	/**
 	 * Registering a FlatFileItemReaderBuiler as ItemReader.
 	 * 
@@ -66,7 +67,6 @@ public class BatchConfiguration {
 				.targetType(Transaction.class).linesToSkip(1).delimited().delimiter(",")
 				.names(Transaction.FIELDS_METADATA).build();
 	}
-
 
 	@Bean
 	ItemProcessor<Transaction, Transaction> itemProcessor(Validator<Transaction> validator) {
