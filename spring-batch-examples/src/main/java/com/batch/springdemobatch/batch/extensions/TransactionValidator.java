@@ -18,7 +18,7 @@ public class TransactionValidator implements Validator<Transaction>{
 	
 	@Override
 	public void validate(Transaction transaction) throws ValidationException {
-		logger.info("Current Object in Validation \n" + transaction);
+		logger.error("Current Object in Validation \n" + transaction);
 		if(transaction.getContactFirstName()  == null) {
 			logger.error("Validation Failed : contact First name can not be null");
 			 throw new ValidationException("Validation Failed : contact First name can not be null ");
