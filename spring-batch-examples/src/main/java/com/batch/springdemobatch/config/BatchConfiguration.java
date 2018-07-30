@@ -3,7 +3,6 @@ package com.batch.springdemobatch.config;
 import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
 
-
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.ItemReadListener;
@@ -22,11 +21,14 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
+import org.springframework.batch.item.xml.builder.StaxEventItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.oxm.Marshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import com.batch.springdemobatch.batch.extensions.TransactionItemSkipListerner;
 import com.batch.springdemobatch.model.Transaction;
@@ -44,7 +46,6 @@ import com.batch.springdemobatch.model.Transaction;
 @Profile("single")
 @Configuration
 public class BatchConfiguration {
-	
 
 	/**
 	 * Defining an input resource. From this location, batch will try to load the
@@ -54,7 +55,9 @@ public class BatchConfiguration {
 
 	@Value("${spring-batch.single.input.resource.path}")
 	private FileSystemResource inputCsv;
-
+	
+	@Value("${spring-batch.single.output.location.pathxml}")
+	private FileSystemResource outputResource;
 	
 	/**
 	 * Registering a FlatFileItemReaderBuiler as ItemReader.
@@ -69,7 +72,6 @@ public class BatchConfiguration {
 				.names(Transaction.FIELDS_METADATA).build();
 	}
 
-
 	@Bean
 	ItemProcessor<Transaction, Transaction> itemProcessor(Validator<Transaction> validator) {
 		return new ValidatingItemProcessor<Transaction>(validator);
@@ -82,11 +84,30 @@ public class BatchConfiguration {
 	 * @param dataSource
 	 * @return
 	 */
-	@Bean
+/*	@Bean
 	ItemWriter<Transaction> itemWriter(DataSource dataSource) {
 		return new JdbcBatchItemWriterBuilder<Transaction>().dataSource(dataSource)
 				.sql(Transaction.INSERT_TRANSACTION_SQL).beanMapped().build();
 
+	}*/
+	
+	@Bean
+	public Marshaller marshaller() {
+		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+		marshaller.setClassesToBeBound(new Class[] { Transaction.class });
+		return marshaller;
+	}
+
+	// Adding an XML Writer
+	@Bean
+	ItemWriter<Transaction> xmlItemWriter(TransactionXMLMetadataConfiguration tConfiguration) {
+		return new StaxEventItemWriterBuilder<Transaction>().
+				name("xml-writer").
+				resource(outputResource).
+				marshaller(marshaller()).
+				rootTagName(tConfiguration.getRootTagName()).
+				build();
+	
 	}
 
 	/**
@@ -107,14 +128,13 @@ public class BatchConfiguration {
 	@Bean
 	Job job(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory,
 			ItemReader<? extends Transaction> itemReader, ItemWriter<? super Transaction> itemWriter,
-			ItemProcessor<Transaction, Transaction> processor,
-			SkipListener<Transaction, Transaction> skipListener,
+			ItemProcessor<Transaction, Transaction> processor, SkipListener<Transaction, Transaction> skipListener,
 			ItemReadListener<Transaction> itemReadListener) {
 
 		Step step = stepBuilderFactory.get("spring-batch-step").<Transaction, Transaction>chunk(100).reader(itemReader)
 				.processor(processor).writer(itemWriter).listener(itemReadListener).faultTolerant()
 				.skip(FlatFileParseException.class)
-				/*.listener(skipListener())*/
+				/* .listener(skipListener()) */
 				.listener(skipListener)
 
 				.noSkip(FileNotFoundException.class).skipLimit(200).build();

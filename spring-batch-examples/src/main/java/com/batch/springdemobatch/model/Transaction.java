@@ -4,7 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.springframework.beans.factory.annotation.Autowired;
+@XmlRootElement(name = "transactionRecord")
 public class Transaction implements Serializable {
+	
 
 	public static String[] FIELDS_METADATA = new String[] { "orderNumber", "quantityOrdered", "priceEach",
 			"orderLineNumber", "sales", "orderDate", "status", "qtrId", "monthId", "yearId", "productLine", "msrp",
