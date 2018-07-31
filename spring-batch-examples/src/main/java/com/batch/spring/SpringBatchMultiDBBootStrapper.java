@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import com.batch.spring.multidb.config.OracleDataSourceConfiguration;
+import com.batch.spring.multidb.config.PostgresqlDataSourceConfiguration;
 
 @SpringBootApplication
 @EnableBatchProcessing
@@ -20,7 +21,9 @@ public class SpringBatchMultiDBBootStrapper {
 	OracleDataSourceConfiguration oracleDs;
 	
 	
-	
+	@Autowired
+	PostgresqlDataSourceConfiguration postgresDs;
+
 	
 	
 	public static void main(String[] args) {
@@ -34,6 +37,7 @@ public class SpringBatchMultiDBBootStrapper {
 		return args -> {
 			System.out.println("CommandLineRunner running in the UnsplashApplication class...");
 			System.out.println("oracleDs " + oracleDs);
+			System.out.println("postgresDs " + postgresDs);
 		};
 	}
 }

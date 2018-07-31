@@ -44,4 +44,10 @@ public class PostgresqlDataSourceConfiguration {
 		this.driverClassName = driverClassName;
 	}
 
+	@Override
+	public String toString() {
+		return "PostgresqlDataSourceConfiguration [url=" + url + ", password=" + password + ", userName=" + userName
+				+ ", driverClassName=" + driverClassName + "]";
+	}
+
 }

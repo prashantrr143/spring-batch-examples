@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Profile;
 
 @SpringBootApplication
 @EnableBatchProcessing
-
 @Profile({"steps","csv-xml"})
 public class SpringBatchMultiStepsBootStrapper {
 
