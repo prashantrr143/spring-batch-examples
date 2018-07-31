@@ -26,6 +26,7 @@ public class CSVToXMLBatchJobMetaDataConfigProperties {
 	private int csvReadChunkSize;
 	private int jdbcReadChunkSize;
 	private int csvReadSkipLimit;
+	private int jdbcReadSkipLimit;
 
 	public String getBatchName() {
 		return batchName;
@@ -89,6 +90,14 @@ public class CSVToXMLBatchJobMetaDataConfigProperties {
 
 	public void setCsvReadSkipLimit(int csvReadSkipLimit) {
 		this.csvReadSkipLimit = csvReadSkipLimit;
+	}
+
+	public int getJdbcReadSkipLimit() {
+		return jdbcReadSkipLimit;
+	}
+
+	public void setJdbcReadSkipLimit(int jdbcReadSkipLimit) {
+		this.jdbcReadSkipLimit = jdbcReadSkipLimit;
 	}
 
 }
