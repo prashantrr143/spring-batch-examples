@@ -46,7 +46,7 @@
 			<!-- <AppenderRef ref="Console" /> -->
 			<AppenderRef ref="ErrorRollingFile" />
 		</Logger>
-
+		
 	</Loggers>
 
 </Configuration>

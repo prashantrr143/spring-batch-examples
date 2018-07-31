@@ -1,4 +1,4 @@
-package com.batch.springdemobatch.multidb;
+package com.batch.springdemobatch;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.beans.factory.annotation.Autowired;

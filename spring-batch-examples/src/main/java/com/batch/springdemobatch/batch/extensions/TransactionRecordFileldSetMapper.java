@@ -9,6 +9,7 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
 
+import com.batch.springdemobatch.batch.validators.TransactionValidator;
 import com.batch.springdemobatch.model.Transaction;
 
 /**

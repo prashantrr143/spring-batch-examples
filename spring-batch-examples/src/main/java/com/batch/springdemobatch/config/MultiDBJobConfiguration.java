@@ -1,8 +1,11 @@
-package com.batch.springdemobatch.multidb.config;
+package com.batch.springdemobatch.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
+import com.batch.springdemobatch.multidb.config.OracleDataSourceConfiguration;
+import com.batch.springdemobatch.multidb.config.PostgresqlDataSourceConfiguration;
 
 
 /**

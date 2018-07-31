@@ -1,4 +1,4 @@
-package com.batch.springdemobatch.batch.extensions;
+package com.batch.springdemobatch.batch.validators;
 
 import java.math.BigDecimal;
 

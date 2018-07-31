@@ -1,4 +1,4 @@
-package com.batch.springdemobatch.multisteps.config;
+package com.batch.springdemobatch.config;
 
 import java.io.FileNotFoundException;
 import java.sql.ResultSet;
@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -43,10 +44,12 @@ import com.batch.springdemobatch.batch.exceptions.MinPriceValidationException;
 import com.batch.springdemobatch.batch.extensions.TransactionItemReadListener;
 import com.batch.springdemobatch.batch.extensions.TransactionItemSkipListerner;
 import com.batch.springdemobatch.batch.extensions.TransactionJDBCItemWriteListener;
-import com.batch.springdemobatch.batch.extensions.TransactionJDBCValidator;
 import com.batch.springdemobatch.batch.extensions.TransactionRowMapper;
-import com.batch.springdemobatch.batch.extensions.TransactionValidator;
+import com.batch.springdemobatch.batch.validators.TransactionJDBCValidator;
+import com.batch.springdemobatch.batch.validators.TransactionValidator;
 import com.batch.springdemobatch.model.Transaction;
+import com.batch.springdemobatch.multisteps.config.CSVToXMLBatchJobMetaDataConfigProperties;
+import com.batch.springdemobatch.multisteps.config.TransactionXMLMetadataConfiguration;
 
 /**
  * Configuration for Spring batch supporting multiple steps
@@ -60,9 +63,16 @@ import com.batch.springdemobatch.model.Transaction;
 
 @Configuration
 @Profile({ "steps", "csv-xml" })
+
 public class MultiStepsBatchConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(MultiStepsBatchConfiguration.class);
+	
+	
+	@Bean
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
+	}
 
 	/**
 	 * Declaring a Configuration Scope
@@ -240,7 +250,7 @@ public class MultiStepsBatchConfiguration {
 				.<Transaction, Transaction>chunk(batchJobMetaData.getCsvReadChunkSize())
 				.reader(csvToDbConfiguration.csvItemReader()).processor(csvToDbConfiguration.itemProcessor())
 				.writer(csvToDbConfiguration.jdbcItemWriter(dataSource)).listener(new TransactionItemReadListener())
-				.faultTolerant().skip(FlatFileParseException.class).listener(new TransactionItemSkipListerner())
+				.faultTolerant().skip(FlatFileParseException.class)
 				.noSkip(FileNotFoundException.class).skipLimit(batchJobMetaData.getCsvReadSkipLimit()).build();
 
 		Step dbToCSVStep = stepBuilderFactory.get("db-to-csv")
@@ -274,14 +284,17 @@ public class MultiStepsBatchConfiguration {
 	Job csvXmlJob(DataSource dataSource, StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory,
 			CSVtoDBBatchStepConfiguration csvToDbConfiguration,
 			DBtoXMLBatchStepConfiguration dBtoXMLBatchStepConfiguration,
-			CSVToXMLBatchJobMetaDataConfigProperties batchJobMetaData) {
+			CSVToXMLBatchJobMetaDataConfigProperties batchJobMetaData,
+			TransactionItemReadListener itemReadListener) {
 
 		logger.info("Started processing of csvXmlJob ");
 		Step csvToDbStep = stepBuilderFactory.get(batchJobMetaData.getCsvReaderStepName())
 				.<Transaction, Transaction>chunk(batchJobMetaData.getCsvReadChunkSize())
 				.reader(csvToDbConfiguration.csvItemReader()).processor(csvToDbConfiguration.itemProcessor())
-				.writer(csvToDbConfiguration.jdbcItemWriter(dataSource)).listener(new TransactionItemReadListener())
-				.faultTolerant().skip(FlatFileParseException.class).listener(new TransactionItemSkipListerner())
+				.writer(csvToDbConfiguration.jdbcItemWriter(dataSource)).listener(itemReadListener)
+				.faultTolerant().skip(FlatFileParseException.class).skip(SQLException.class)
+				.listener(new TransactionItemSkipListerner())
+				
 				.noSkip(FileNotFoundException.class).skipLimit(batchJobMetaData.getCsvReadSkipLimit()).build();
 
 		Step dbToXMLStep = stepBuilderFactory.get(batchJobMetaData.getJdbcReaderStepName())
@@ -292,7 +305,7 @@ public class MultiStepsBatchConfiguration {
 				.listener(new TransactionJDBCItemWriteListener()).faultTolerant()
 				.listener(new TransactionItemSkipListerner()).skipLimit(batchJobMetaData.getJdbcReadSkipLimit())
 				.noRollback(ValidationException.class).noRollback(MinPriceValidationException.class)
-				.skip(MinPriceValidationException.class).noSkip(SQLException.class).build();
+				.skip(MinPriceValidationException.class).build();
 
 		logger.info(" Both Steps configured properly ");
 
