@@ -5,9 +5,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import com.batch.spring.model.Transaction;
 
+@Component
+@Profile({"csv-xml"})
 public class TransactionJDBCItemWriteListener implements ItemWriteListener<Transaction> {
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionJDBCItemWriteListener.class);

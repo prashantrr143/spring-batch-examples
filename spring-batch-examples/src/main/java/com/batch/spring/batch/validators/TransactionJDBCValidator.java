@@ -12,12 +12,11 @@ import com.batch.spring.model.Transaction;
 
 public class TransactionJDBCValidator implements Validator<Transaction> {
 	private static final Logger logger = LoggerFactory.getLogger(TransactionJDBCValidator.class);
-
 	public static BigDecimal MIN_PRICE_EACH = new BigDecimal("30.0");
 
 	@Override
 	public void validate(Transaction value) throws ValidationException {
-		logger.info("validation of entity from database");
+	
 		if (value != null) {
 			if (value.getPriceEach().compareTo(MIN_PRICE_EACH) < 0) {
 				logger.error("Minimum Price each validation failed : ValidationException Thrown"

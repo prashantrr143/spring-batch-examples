@@ -21,7 +21,7 @@ public class TransactionItemReadListener implements ItemReadListener<Transaction
 
 	@Override
 	public void beforeRead() {
-		logger.info("Started reading a new Item");
+		// TODO Auto-generated method stub
 	}
 
 	

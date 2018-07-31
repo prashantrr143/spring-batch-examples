@@ -31,7 +31,6 @@ public class ErrorReportingServiceImpl implements ErrorReportingService {
 	private JdbcTemplate jdbcTemplate;
 
 	@Override
-
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRES_NEW)
 	public void logSkipErrorLog(Exception ex) {
 		logger.info("Started Error Logging ");
@@ -39,7 +38,7 @@ public class ErrorReportingServiceImpl implements ErrorReportingService {
 		errorLog.setErrorLog(getFormattedReadErrorLog(ex));
 		logger.error(errorLog.getErrorLog());
 		jdbcTemplate.update(SkipTransactionErrorLog.INSERT_SKIP_TRANSACTION_LOG_SQL,
-				new Object[] { errorLog.getId(), errorLog.getErrorLog() });
+				new Object[] { errorLog.getErrorLog() });
 		logger.info(" Error Logging successfull..  ");
 
 	}
@@ -53,7 +52,7 @@ public class ErrorReportingServiceImpl implements ErrorReportingService {
 		errorLog.setErrorLog(getFormattedReadErrorLog(ex));
 		logger.error(errorLog.getErrorLog());
 		jdbcTemplate.update(SkipTransactionErrorLog.INSERT_SKIP_TRANSACTION_LOG_SQL,
-				new Object[] { errorLog.getId(), errorLog.getErrorLog() });
+				new Object[] { errorLog.getErrorLog() });
 		logger.info(" Error Logging successfull..  ");
 
 	}

@@ -2,16 +2,17 @@ package com.batch.spring.model;
 
 import java.io.Serializable;
 
+/**
+ * Model 
+ * @author prasingh26
+ *
+ */
 public class SkipTransactionErrorLog implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final String INSERT_SKIP_TRANSACTION_LOG_SQL ="insert into skip_transaction_error_log values (?,?)";
+	public static final String INSERT_SKIP_TRANSACTION_LOG_SQL ="insert into skip_transaction_error_log(error_log) values (?)";
 
-	private Long id;
+	private Long id; 
 
 	private String errorLog;
 
