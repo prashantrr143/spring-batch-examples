@@ -13,7 +13,7 @@ import com.batch.spring.multidb.config.OracleDataSourceConfiguration;
 @SpringBootApplication
 @EnableBatchProcessing
 @Profile("multidb")
-public class SpringBatchMultiDBBoostrapper {
+public class SpringBatchMultiDBBootStrapper {
 
 	
 	@Autowired
@@ -24,7 +24,7 @@ public class SpringBatchMultiDBBoostrapper {
 	
 	
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBatchMultiDBBoostrapper.class, args);
+		SpringApplication.run(SpringBatchMultiDBBootStrapper.class, args);
 	
 	}
 	

@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Profile;
 @EnableBatchProcessing
 
 @Profile({"steps","csv-xml"})
-public class SpringBatchMultiStepsBoostrapper {
+public class SpringBatchMultiStepsBootStrapper {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBatchMultiStepsBoostrapper.class, args);
+		SpringApplication.run(SpringBatchMultiStepsBootStrapper.class, args);
 	}
 }
