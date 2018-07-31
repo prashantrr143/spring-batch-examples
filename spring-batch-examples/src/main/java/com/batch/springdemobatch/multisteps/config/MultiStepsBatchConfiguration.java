@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -24,15 +25,20 @@ import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
+import org.springframework.batch.item.xml.builder.StaxEventItemWriterBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.oxm.Marshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import com.batch.springdemobatch.batch.extensions.TransactionItemReadListener;
 import com.batch.springdemobatch.batch.extensions.TransactionItemSkipListerner;
+import com.batch.springdemobatch.batch.extensions.TransactionRowMapper;
 import com.batch.springdemobatch.batch.extensions.TransactionValidator;
 import com.batch.springdemobatch.model.Transaction;
 
@@ -47,8 +53,57 @@ import com.batch.springdemobatch.model.Transaction;
  */
 
 @Configuration
-@Profile("steps")
+@Profile({ "steps", "csv-xml" })
 public class MultiStepsBatchConfiguration {
+
+	/**
+	 * Declaring a Configuration Scope
+	 * 
+	 * This scope has beans defined for DB to XML Configuration Step
+	 * 
+	 * @author prashantsingh
+	 *
+	 */
+
+	@Configuration
+	@Profile({ "steps", "csv-xml" })
+	public static class DBtoXMLBatchStepConfiguration {
+
+		@Value("${spring-batch.single.output.location.pathxml}")
+		private FileSystemResource outputResource;
+
+		@Autowired
+		private CSVToXMLBatchJobMetaDataConfigProperties batchMetaData;
+
+		@Bean
+		public Marshaller marshaller() {
+			Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+			marshaller.setClassesToBeBound(new Class[] { Transaction.class });
+			return marshaller;
+		}
+
+		// Adding an XML Writer
+		@Bean
+		ItemWriter<Transaction> xmlItemWriter(TransactionXMLMetadataConfiguration tConfiguration) {
+			return new StaxEventItemWriterBuilder<Transaction>().name(batchMetaData.getXmlWriterStepName())
+					.resource(outputResource).marshaller(marshaller()).rootTagName(tConfiguration.getRootTagName())
+					.build();
+
+		}
+
+		@Bean
+		ItemProcessor<Transaction, Transaction> itemProcessor() {
+			return new ValidatingItemProcessor<Transaction>(new TransactionValidator());
+		}
+
+		@Bean
+		ItemReader<Transaction> jdbcItemReader(DataSource dataSource) {
+			return new JdbcCursorItemReaderBuilder<Transaction>().sql(Transaction.SELECT_TRANSACTION_SQL)
+					.name(batchMetaData.getJdbcReaderStepName()).dataSource(dataSource)
+					.rowMapper(new TransactionRowMapper()).build();
+		}
+
+	}
 
 	/**
 	 * Defining Configuration for CSV to Batch Step Batch Job
@@ -58,7 +113,7 @@ public class MultiStepsBatchConfiguration {
 	 */
 
 	@Configuration
-	@Profile("steps")
+	@Profile({ "steps", "csv-xml" })
 	public static class CSVtoDBBatchStepConfiguration {
 
 		/**
@@ -105,6 +160,7 @@ public class MultiStepsBatchConfiguration {
 
 	/**
 	 * A Spring Configuration : Used for Scoping purpose
+	 * 
 	 * @author prasingh26
 	 *
 	 */
@@ -149,30 +205,61 @@ public class MultiStepsBatchConfiguration {
 	 * Registering a Job( Actual runnable job) in to the context. If Spring finds
 	 * any job registered, is starts them.
 	 * 
-	 * @param dataSource Data source configured by Spring Boot Default Configuration
-	 * @param stepBuilderFactory StepBuilderFactory : used to build Steps for Job
-	 * @param jobBuilderFactory  JobBuilderFactory : used to build Jobs
-	 * @param csvToDbConfiguration A Configuration Object
-	 * @param dbBtoCSVBatchConfiguration  A Configuraion Object
+	 * @param dataSource                 Data source configured by Spring Boot
+	 *                                   Default Configuration
+	 * @param stepBuilderFactory         StepBuilderFactory : used to build Steps
+	 *                                   for Job
+	 * @param jobBuilderFactory          JobBuilderFactory : used to build Jobs
+	 * @param csvToDbConfiguration       A Configuration Object
+	 * @param dbBtoCSVBatchConfiguration A Configuration Object
 	 * @return Job instance
 	 */
 	@Bean
+	@Profile("steps")
 	Job job(DataSource dataSource, StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory,
-			CSVtoDBBatchStepConfiguration csvToDbConfiguration,
-			DBtoCSVBatchConfiguration dbBtoCSVBatchConfiguration) {
+			CSVtoDBBatchStepConfiguration csvToDbConfiguration, DBtoCSVBatchConfiguration dbBtoCSVBatchConfiguration,
+			CSVToXMLBatchJobMetaDataConfigProperties batchJobMetaData) {
 
-		Step csvToDbStep = stepBuilderFactory.get("csv-to-db").<Transaction, Transaction>chunk(100)
+		System.out.println("Started CSV TO CSV batch Job");
+
+		Step csvToDbStep = stepBuilderFactory.get(batchJobMetaData.getCsvReaderStepName())
+				.<Transaction, Transaction>chunk(batchJobMetaData.getCsvReadChunkSize())
 				.reader(csvToDbConfiguration.csvItemReader()).processor(csvToDbConfiguration.itemProcessor())
 				.writer(csvToDbConfiguration.jdbcItemWriter(dataSource)).listener(new TransactionItemReadListener())
 				.faultTolerant().skip(FlatFileParseException.class).listener(new TransactionItemSkipListerner())
-				.noSkip(FileNotFoundException.class).skipLimit(200).build();
+				.noSkip(FileNotFoundException.class).skipLimit(batchJobMetaData.getCsvReadSkipLimit()).build();
 
-		Step dbToCSVStep = stepBuilderFactory.get("db-to-csv").<Map<Integer, String>, Map<Integer, String>>chunk(1000)
+		Step dbToCSVStep = stepBuilderFactory.get("db-to-csv")
+				.<Map<Integer, String>, Map<Integer, String>>chunk(batchJobMetaData.getJdbcReadChunkSize())
 				.reader(dbBtoCSVBatchConfiguration.jdbcItemReader(dataSource))
 				.writer(dbBtoCSVBatchConfiguration.csvItemWriter()).build();
 
-		return jobBuilderFactory.get("spring-batch-job2").incrementer(new RunIdIncrementer()).start(csvToDbStep)
-				.next(dbToCSVStep).build();
+		return jobBuilderFactory.get(batchJobMetaData.getBatchName()).incrementer(new RunIdIncrementer())
+				.start(csvToDbStep).next(dbToCSVStep).build();
+
+	}
+
+	@Bean
+	@Profile("csv-xml")
+	Job csvXmlJob(DataSource dataSource, StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory,
+			CSVtoDBBatchStepConfiguration csvToDbConfiguration, DBtoXMLBatchStepConfiguration dBtoXMLBatchStepConfiguration,
+			CSVToXMLBatchJobMetaDataConfigProperties batchJobMetaData) {
+
+		System.out.println("Started CSV TO XML batch Job");
+		Step csvToDbStep = stepBuilderFactory.get(batchJobMetaData.getCsvReaderStepName())
+				.<Transaction, Transaction>chunk(batchJobMetaData.getCsvReadChunkSize())
+				.reader(csvToDbConfiguration.csvItemReader()).processor(csvToDbConfiguration.itemProcessor())
+				.writer(csvToDbConfiguration.jdbcItemWriter(dataSource)).listener(new TransactionItemReadListener())
+				.faultTolerant().skip(FlatFileParseException.class).listener(new TransactionItemSkipListerner())
+				.noSkip(FileNotFoundException.class).skipLimit(batchJobMetaData.getCsvReadSkipLimit()).build();
+
+		Step dbToXMLStep = stepBuilderFactory.get(batchJobMetaData.getJdbcReaderStepName())
+				.<Transaction,Transaction>chunk(batchJobMetaData.getJdbcReadChunkSize())
+				.reader(dBtoXMLBatchStepConfiguration.jdbcItemReader(dataSource))
+				.writer(dBtoXMLBatchStepConfiguration.xmlItemWriter(null)).build();
+
+		return jobBuilderFactory.get(batchJobMetaData.getBatchName()).incrementer(new RunIdIncrementer())
+				.start(csvToDbStep).next(dbToXMLStep).build();
 
 	}
 

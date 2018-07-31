@@ -1,10 +1,12 @@
-package com.batch.springdemobatch.config;
+package com.batch.springdemobatch.multisteps.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "xml.metadata.transaction")
+@Profile({"steps","csv-xml"})
 public class TransactionXMLMetadataConfiguration {
 
 	/**

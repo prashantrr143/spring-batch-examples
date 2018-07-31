@@ -32,6 +32,7 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import com.batch.springdemobatch.batch.extensions.TransactionItemSkipListerner;
 import com.batch.springdemobatch.model.Transaction;
+import com.batch.springdemobatch.multisteps.config.TransactionXMLMetadataConfiguration;
 
 /**
  * Configuration for Spring batch
